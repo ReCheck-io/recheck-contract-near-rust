@@ -44,7 +44,7 @@ Deploy the contract using a new testnet account.
 near dev-deploy ./target/wasm32-unknown-unknown/release/recheck_near.wasm
 ```
 
-### 2. Interact with the Contract using NEAR CLI
+### 3. Interact with the Contract using NEAR CLI
 
 Execute change method (*you have to be logged in with the **same** NEAR wallet used for deployment*)
 
@@ -62,6 +62,6 @@ near call --accountId ANY-WALLET-ID.TESTNET ANY-ACCOUNT records '{"record_id_str
 
 # Learn More
 
-1. Learn more about the contract through its [README](./README.md).
+1. Learn more about the contract through its [**README**](./README.md).
 2. Test [**our solution**](https://beta.recheck.io/) which uses this contract.
 3. Check our [**GitHub**](https://github.com/ReCheck-io/) for more.

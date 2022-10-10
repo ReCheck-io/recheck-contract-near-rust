@@ -157,13 +157,13 @@ impl RecheckRecords {
         let extra_0_str: String = trail_str.clone();
         let extra_1_str: String = trail_str.clone();
 
-        RecheckRecords::createSubRecordWithExtras2(self,
-                                                   record_id_str,
-                                                   parent_record_id_str,
-                                                   trail_str,
-                                                   trail_signature_str,
-                                                   extra_0_str,
-                                                   extra_1_str);
+        return RecheckRecords::createSubRecordWithExtras2(self,
+                                                          record_id_str,
+                                                          parent_record_id_str,
+                                                          trail_str,
+                                                          trail_signature_str,
+                                                          extra_0_str,
+                                                          extra_1_str);
     }
 
     pub fn createRecord(&mut self,
@@ -176,15 +176,14 @@ impl RecheckRecords {
         let extra_0_str: String = trail_str.clone();
         let extra_1_str: String = trail_str.clone();
 
-        RecheckRecords::createSubRecordWithExtras2(self,
-                                                   record_id_str,
-                                                   parent_record_id_str,
-                                                   trail_str,
-                                                   trail_signature_str,
-                                                   extra_0_str,
-                                                   extra_1_str);
+        return RecheckRecords::createSubRecordWithExtras2(self,
+                                                          record_id_str,
+                                                          parent_record_id_str,
+                                                          trail_str,
+                                                          trail_signature_str,
+                                                          extra_0_str,
+                                                          extra_1_str);
     }
-
 
     pub fn records(self, record_id_str: String) -> (String,
                                                     String,
@@ -307,5 +306,425 @@ impl RecheckRecords {
         let record_id_str: String = RecheckRecords::hash_to_string(record_id);
 
         return RecheckRecords::records(self, record_id_str);
+    }
+}
+
+// 4. Tests
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod tests {
+    use super::*;
+    use near_sdk::test_utils::{accounts, VMContextBuilder};
+    use near_sdk::{log, testing_env};
+
+    fn get_context(predecessor_account_id: AccountId) -> VMContextBuilder {
+        let mut builder = VMContextBuilder::new();
+        builder.current_account_id(accounts(0))
+            .signer_account_id(predecessor_account_id.clone())
+            .predecessor_account_id(predecessor_account_id);
+
+        return builder;
+    }
+
+    fn create_random_hash() -> String {
+        use rand::Rng;
+
+        const HEX_CHARSET: &[u8] = b"abcdef0123456789";
+        const HASH_LEN: usize = 64;
+        let mut rng = rand::thread_rng();
+
+        let random_hash: String = (0..HASH_LEN)
+            .map(|_| {
+                let idx = rng.gen_range(0..HEX_CHARSET.len());
+                HEX_CHARSET[idx] as char
+            })
+            .collect();
+
+        return random_hash;
+    }
+
+    #[test]
+    fn create_and_get_new_record() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_trail_str{:?}",random_record_id);
+
+        contract.createRecord(random_record_id.clone(),
+                              random_trail.clone(),
+                              random_trail_signature.clone());
+
+        let result = contract.records(random_record_id.clone());
+
+        log!("result{:?}",result);
+
+        let expected = (
+            String::from(random_record_id.clone()),
+            String::from(random_record_id.clone()),
+            String::from(random_trail.clone()),
+            String::from(random_trail_signature.clone()),
+            accounts(1),
+            0,
+            0
+        );
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn create_and_get_new_sub_record() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_parent_record_id = create_random_hash();
+        log!("random_parent_record_id{:?}",random_parent_record_id);
+        let random_parent_trail = create_random_hash();
+        log!("random_parent_trail{:?}",random_parent_trail);
+        let random_parent_trail_signature = create_random_hash();
+        log!("random_parent_trail_signature{:?}",random_parent_record_id);
+
+        contract.createRecord(random_parent_record_id.clone(),
+                              random_parent_trail.clone(),
+                              random_parent_trail_signature.clone());
+
+
+        let random_sub_record_id = create_random_hash();
+        log!("random_sub_record_id{:?}",random_sub_record_id);
+        let random_sub_trail = create_random_hash();
+        log!("random_sub_trail{:?}",random_sub_trail);
+        let random_sub_trail_signature = create_random_hash();
+        log!("random_trail_str{:?}",random_parent_record_id);
+
+        contract.createSubRecord(random_sub_record_id.clone(),
+                                 random_parent_record_id.clone(),
+                                 random_sub_trail.clone(),
+                                 random_sub_trail_signature.clone());
+
+        let result = contract.subRecord(random_parent_record_id.clone(), 1);
+
+        log!("result{:?}",result);
+
+        let expected = (
+            String::from(random_parent_record_id.clone()),
+            String::from(random_parent_record_id.clone()),
+            String::from(random_parent_trail.clone()),
+            String::from(random_parent_trail_signature.clone()),
+            accounts(1),
+            0,
+            1
+        );
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn create_and_get_new_record_with_extras_2() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_parent_trail_signature{:?}",random_trail_signature);
+        let random_extra_0 = create_random_hash();
+        log!("random_extra_0{:?}",random_extra_0);
+        let random_extra_1 = create_random_hash();
+        log!("random_extra_1{:?}",random_extra_1);
+
+        contract.createSubRecordWithExtras2(random_record_id.clone(),
+                                            random_record_id.clone(),
+                                            random_trail.clone(),
+                                            random_trail_signature.clone(),
+                                            random_extra_0.clone(),
+                                            random_extra_1.clone());
+
+        let result = contract.records(random_record_id.clone());
+
+        log!("result{:?}",result);
+
+        let expected = (
+            String::from(random_record_id.clone()),
+            String::from(random_record_id.clone()),
+            String::from(random_trail.clone()),
+            String::from(random_trail_signature.clone()),
+            accounts(1),
+            0,
+            0
+        );
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn create_and_verify_trail() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_trail_str{:?}",random_record_id);
+
+        contract.createRecord(random_record_id.clone(),
+                              random_trail.clone(),
+                              random_trail_signature.clone());
+
+        let result = contract.verifyTrail(random_trail.clone());
+
+        log!("result{:?}",result);
+
+        let expected = (
+            String::from(random_record_id.clone()),
+            String::from(random_record_id.clone()),
+            String::from(random_trail.clone()),
+            String::from(random_trail_signature.clone()),
+            accounts(1),
+            0,
+            0
+        );
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn create_and_verify_extra_0() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_parent_trail_signature{:?}",random_trail_signature);
+        let random_extra_0 = create_random_hash();
+        log!("random_extra_0{:?}",random_extra_0);
+        let random_extra_1 = create_random_hash();
+        log!("random_extra_1{:?}",random_extra_1);
+
+        contract.createSubRecordWithExtras2(random_record_id.clone(),
+                                            random_record_id.clone(),
+                                            random_trail.clone(),
+                                            random_trail_signature.clone(),
+                                            random_extra_0.clone(),
+                                            random_extra_1.clone());
+
+        let result = contract.verifyExtra0(random_extra_0.clone());
+
+        log!("result{:?}",result);
+
+        let expected = (
+            String::from(random_record_id.clone()),
+            String::from(random_record_id.clone()),
+            String::from(random_trail.clone()),
+            String::from(random_trail_signature.clone()),
+            accounts(1),
+            0,
+            0
+        );
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn create_and_verify_extra_1() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_parent_trail_signature{:?}",random_trail_signature);
+        let random_extra_0 = create_random_hash();
+        log!("random_extra_0{:?}",random_extra_0);
+        let random_extra_1 = create_random_hash();
+        log!("random_extra_1{:?}",random_extra_1);
+
+        contract.createSubRecordWithExtras2(random_record_id.clone(),
+                                            random_record_id.clone(),
+                                            random_trail.clone(),
+                                            random_trail_signature.clone(),
+                                            random_extra_0.clone(),
+                                            random_extra_1.clone());
+
+        let result = contract.verifyExtra1(random_extra_1.clone());
+
+        log!("result{:?}",result);
+
+        let expected = (
+            String::from(random_record_id.clone()),
+            String::from(random_record_id.clone()),
+            String::from(random_trail.clone()),
+            String::from(random_trail_signature.clone()),
+            accounts(1),
+            0,
+            0
+        );
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    #[should_panic]
+    fn create_non_unique_record() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_trail_str{:?}",random_record_id);
+
+        contract.createRecord(random_record_id.clone(),
+                              random_trail.clone(),
+                              random_trail_signature.clone());
+
+        let random_trail_2 = create_random_hash();
+        log!("random_trail_2{:?}",random_trail_2);
+        let random_trail_signature_2 = create_random_hash();
+        log!("random_trail_signature_2{:?}",random_trail_signature_2);
+
+        contract.createRecord(random_record_id.clone(),
+                              random_trail_2.clone(),
+                              random_trail_signature_2.clone());
+    }
+
+    #[test]
+    fn get_non_existing_record() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let contract = RecheckRecords::default();
+        testing_env!(context.is_view(true).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+
+        let result = contract.records(random_record_id);
+        log!("result{:?}",result);
+
+        let expected = RecheckRecords::null_record();
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn verify_wrong_trail() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_trail_str{:?}",random_record_id);
+
+        contract.createRecord(random_record_id.clone(),
+                              random_trail.clone(),
+                              random_trail_signature.clone());
+
+        let result = contract.verifyTrail(random_trail_signature.clone());
+
+        log!("result{:?}",result);
+
+        let expected = RecheckRecords::null_record();
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn verify_wrong_extra_0() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_parent_trail_signature{:?}",random_trail_signature);
+        let random_extra_0 = create_random_hash();
+        log!("random_extra_0{:?}",random_extra_0);
+        let random_extra_1 = create_random_hash();
+        log!("random_extra_1{:?}",random_extra_1);
+
+        contract.createSubRecordWithExtras2(random_record_id.clone(),
+                                            random_record_id.clone(),
+                                            random_trail.clone(),
+                                            random_trail_signature.clone(),
+                                            random_extra_0.clone(),
+                                            random_extra_1.clone());
+
+        let result = contract.verifyExtra0(random_extra_1.clone());
+
+        log!("result{:?}",result);
+
+        let expected = RecheckRecords::null_record();
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn verify_wrong_extra_1() {
+        let mut context = get_context(accounts(1));
+        testing_env!(context.build());
+        let mut contract = RecheckRecords::default();
+        testing_env!(context.is_view(false).build());
+
+        let random_record_id = create_random_hash();
+        log!("random_record_id{:?}",random_record_id);
+        let random_trail = create_random_hash();
+        log!("random_trail{:?}",random_trail);
+        let random_trail_signature = create_random_hash();
+        log!("random_parent_trail_signature{:?}",random_trail_signature);
+        let random_extra_0 = create_random_hash();
+        log!("random_extra_0{:?}",random_extra_0);
+        let random_extra_1 = create_random_hash();
+        log!("random_extra_1{:?}",random_extra_1);
+
+        contract.createSubRecordWithExtras2(random_record_id.clone(),
+                                            random_record_id.clone(),
+                                            random_trail.clone(),
+                                            random_trail_signature.clone(),
+                                            random_extra_0.clone(),
+                                            random_extra_1.clone());
+
+        let result = contract.verifyExtra1(random_extra_0.clone());
+
+        log!("result{:?}",result);
+
+        let expected = RecheckRecords::null_record();
+
+        assert_eq!(result, expected);
     }
 }

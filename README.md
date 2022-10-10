@@ -18,7 +18,23 @@ follow these steps:
 npm install
 ```
 
-### 2. Deploy the Contract using NEAR CLI
+### 2. Build the Contract
+
+Build the contract.
+
+```bash
+RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release
+```
+
+### 2. Run all tests
+
+Run contract tests and verify they pass.
+
+```bash
+cargo test
+```
+
+### 3. Deploy the Contract using NEAR CLI
 
 Install [**NEAR CLI**](https://github.com/near/near-cli)
 
@@ -32,19 +48,13 @@ Login with your NEAR wallet.
 near login
 ```
 
-Build the contract.
-
-```bash
-RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release
-```
-
 Deploy the contract using a new testnet account.
 
 ```bash
 near dev-deploy ./target/wasm32-unknown-unknown/release/recheck_near.wasm
 ```
 
-### 3. Interact with the Contract using NEAR CLI
+### 4. Interact with the Contract using NEAR CLI
 
 Execute change method (*you have to be logged in with the **same** NEAR wallet used for deployment*)
 

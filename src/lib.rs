@@ -585,7 +585,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
+    #[should_panic(expected = "Record must be unique.")]
     fn create_non_unique_record() {
         let mut context = get_context(accounts(1));
         testing_env!(context.build());

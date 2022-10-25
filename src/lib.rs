@@ -1,7 +1,8 @@
-use near_sdk::{near_bindgen, BorshStorageKey, require, AccountId, Timestamp};
+use near_sdk::{near_bindgen, BorshStorageKey, require, AccountId, Timestamp, CryptoHash};
 use near_sdk::env::{block_timestamp, signer_account_id};
 use near_sdk::collections::{UnorderedMap, Vector};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
+use hex::{FromHex, encode};
 
 // 1. Main Struct
 // Main contract structure serialized with Borsh
@@ -9,25 +10,25 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 #[derive(BorshDeserialize, BorshSerialize)]
 #[allow(non_snake_case)]
 struct RecheckRecords {
-    objectRecords: UnorderedMap<[u8; 64], ObjectRecord>,
-    objectSubRecords: UnorderedMap<[u8; 64], Vector<[u8; 64]>>,
-    trails: UnorderedMap<[u8; 64], [u8; 64]>,
-    e0: UnorderedMap<[u8; 64], [u8; 64]>,
-    e1: UnorderedMap<[u8; 64], [u8; 64]>,
+    objectRecords: UnorderedMap<CryptoHash, ObjectRecord>,
+    objectSubRecords: UnorderedMap<CryptoHash, Vector<CryptoHash>>,
+    trails: UnorderedMap<CryptoHash, CryptoHash>,
+    e0: UnorderedMap<CryptoHash, CryptoHash>,
+    e1: UnorderedMap<CryptoHash, CryptoHash>,
 }
 
 // Helper structure serialized with Borsh
 #[allow(non_snake_case)]
 #[derive(BorshDeserialize, BorshSerialize)]
 struct ObjectRecord {
-    recordId: [u8; 64],
-    parentRecordId: [u8; 64],
-    trail: [u8; 64],
-    trailSignature: [u8; 64],
+    recordId: CryptoHash,
+    parentRecordId: CryptoHash,
+    trail: CryptoHash,
+    trailSignature: CryptoHash,
     creator: AccountId,
     timestamp: Timestamp,
-    extra0: [u8; 64],
-    extra1: [u8; 64],
+    extra0: CryptoHash,
+    extra1: CryptoHash,
 }
 
 // 2. Default Implementation
@@ -58,23 +59,20 @@ impl Default for RecheckRecords {
 // 3. Core Logic
 // Helper functions
 impl RecheckRecords {
-    fn only_unique_records(contract_self: &RecheckRecords, record_id_str: &String) -> [u8; 64] {
-        let record_id: [u8; 64] = record_id_str.as_bytes().try_into()
+    fn only_unique_records(contract_self: &RecheckRecords, record_id_str: &String) -> CryptoHash {
+        let record_id: CryptoHash = <CryptoHash>::from_hex(record_id_str)
             .expect("Invalid recordId hash.");
         require!(contract_self.objectRecords.get(&record_id).is_none(), "Record must be unique.");
         return record_id;
     }
 
-    fn string_to_hash(str: String) -> [u8; 64] {
-        let hash: [u8; 64] = str.as_bytes().try_into()
-            .expect("Invalid hash.");
-        return hash;
+    fn string_to_hex_bytes(str: String) -> CryptoHash {
+        let hex_bytes: CryptoHash = <CryptoHash>::from_hex(str).expect("Invalid hex string.");
+        return hex_bytes;
     }
 
-    fn hash_to_string(hash: [u8; 64]) -> String {
-        let str: String = std::str::from_utf8(&hash)
-            .expect("Invalid utf8 string").to_string();
-        return str;
+    fn hex_bytes_to_string(hex_bytes: CryptoHash) -> String {
+        return encode(hex_bytes);
     }
 
     fn null_record() -> (String,
@@ -108,13 +106,13 @@ impl RecheckRecords {
                                       trail_signature_str: String,
                                       extra_0_str: String,
                                       extra_1_str: String) {
-        let record_id: [u8; 64] = RecheckRecords::only_unique_records(&self, &record_id_str);
+        let record_id: CryptoHash = RecheckRecords::only_unique_records(&self, &record_id_str);
 
-        let parent_record_id: [u8; 64] = RecheckRecords::string_to_hash(parent_record_id_str);
-        let trail: [u8; 64] = RecheckRecords::string_to_hash(trail_str);
-        let trail_signature: [u8; 64] = RecheckRecords::string_to_hash(trail_signature_str);
-        let extra_0: [u8; 64] = RecheckRecords::string_to_hash(extra_0_str);
-        let extra_1: [u8; 64] = RecheckRecords::string_to_hash(extra_1_str);
+        let parent_record_id: CryptoHash = RecheckRecords::string_to_hex_bytes(parent_record_id_str);
+        let trail: CryptoHash = RecheckRecords::string_to_hex_bytes(trail_str);
+        let trail_signature: CryptoHash = RecheckRecords::string_to_hex_bytes(trail_signature_str);
+        let extra_0: CryptoHash = RecheckRecords::string_to_hex_bytes(extra_0_str);
+        let extra_1: CryptoHash = RecheckRecords::string_to_hex_bytes(extra_1_str);
 
         let record = ObjectRecord {
             recordId: record_id,
@@ -131,11 +129,11 @@ impl RecheckRecords {
 
         if record_id != parent_record_id {
             if self.objectSubRecords.get(&parent_record_id).is_none() {
-                let sub_records_empty_vec: Vector<[u8; 64]> = Vector::new(StorageKeys::SubRecordsVector);
+                let sub_records_empty_vec: Vector<CryptoHash> = Vector::new(StorageKeys::SubRecordsVector);
                 self.objectSubRecords.insert(&parent_record_id, &sub_records_empty_vec);
             }
 
-            let mut new_sub_records: Vector<[u8; 64]> = self.objectSubRecords.get(&parent_record_id)
+            let mut new_sub_records: Vector<CryptoHash> = self.objectSubRecords.get(&parent_record_id)
                 .expect("No parent record found!!!");
             new_sub_records.push(&record_id);
 
@@ -192,7 +190,7 @@ impl RecheckRecords {
                                                     AccountId,
                                                     Timestamp,
                                                     u64) {
-        let record_id_hash: [u8; 64] = RecheckRecords::string_to_hash(record_id_str);
+        let record_id_hash: CryptoHash = RecheckRecords::string_to_hex_bytes(record_id_str);
 
         if self.objectRecords.get(&record_id_hash).is_none() {
             return RecheckRecords::null_record();
@@ -202,10 +200,10 @@ impl RecheckRecords {
         let record: ObjectRecord = self.objectRecords.get(&record_id_hash)
             .expect("None existing record");
 
-        let record_id: String = RecheckRecords::hash_to_string(record.recordId);
-        let parent_record_id: String = RecheckRecords::hash_to_string(record.parentRecordId);
-        let trail: String = RecheckRecords::hash_to_string(record.trail);
-        let trail_signature: String = RecheckRecords::hash_to_string(record.trailSignature);
+        let record_id: String = RecheckRecords::hex_bytes_to_string(record.recordId);
+        let parent_record_id: String = RecheckRecords::hex_bytes_to_string(record.parentRecordId);
+        let trail: String = RecheckRecords::hex_bytes_to_string(record.trail);
+        let trail_signature: String = RecheckRecords::hex_bytes_to_string(record.trailSignature);
         let creator: AccountId = record.creator;
         let timestamp: Timestamp = record.timestamp;
         let mut sub_records_length: u64 = 0;
@@ -224,21 +222,21 @@ impl RecheckRecords {
                                                                       AccountId,
                                                                       Timestamp,
                                                                       u64) {
-        let sub_record_id: [u8; 64] = RecheckRecords::string_to_hash(sub_record_id_str);
+        let sub_record_id: CryptoHash = RecheckRecords::string_to_hex_bytes(sub_record_id_str);
 
         if self.objectSubRecords.get(&sub_record_id).is_none() {
             return RecheckRecords::null_record();
         }
 
 
-        let sub_records: Vector<[u8; 64]> = self.objectSubRecords.get(&sub_record_id)
+        let sub_records: Vector<CryptoHash> = self.objectSubRecords.get(&sub_record_id)
             .expect("None existing sub record");
 
         if !sub_records.get(index).is_none() {
             return RecheckRecords::null_record();
         }
 
-        let sub_record_id_str: String = RecheckRecords::hash_to_string(sub_record_id);
+        let sub_record_id_str: String = RecheckRecords::hex_bytes_to_string(sub_record_id);
 
         return RecheckRecords::records(self, sub_record_id_str);
     }
@@ -250,17 +248,17 @@ impl RecheckRecords {
                                                     AccountId,
                                                     Timestamp,
                                                     u64) {
-        let trail: [u8; 64] = RecheckRecords::string_to_hash(trail_str);
+        let trail: CryptoHash = RecheckRecords::string_to_hex_bytes(trail_str);
 
         if self.trails.get(&trail).is_none() {
             return RecheckRecords::null_record();
         }
 
 
-        let record_id: [u8; 64] = self.trails.get(&trail)
+        let record_id: CryptoHash = self.trails.get(&trail)
             .expect("None existing record");
 
-        let record_id_str: String = RecheckRecords::hash_to_string(record_id);
+        let record_id_str: String = RecheckRecords::hex_bytes_to_string(record_id);
 
         return RecheckRecords::records(self, record_id_str);
     }
@@ -272,17 +270,17 @@ impl RecheckRecords {
                                                        AccountId,
                                                        Timestamp,
                                                        u64) {
-        let extra_0: [u8; 64] = RecheckRecords::string_to_hash(extra_0_str);
+        let extra_0: CryptoHash = RecheckRecords::string_to_hex_bytes(extra_0_str);
 
         if self.e0.get(&extra_0).is_none() {
             return RecheckRecords::null_record();
         }
 
 
-        let record_id: [u8; 64] = self.e0.get(&extra_0)
+        let record_id: CryptoHash = self.e0.get(&extra_0)
             .expect("None existing record");
 
-        let record_id_str: String = RecheckRecords::hash_to_string(record_id);
+        let record_id_str: String = RecheckRecords::hex_bytes_to_string(record_id);
 
         return RecheckRecords::records(self, record_id_str);
     }
@@ -294,16 +292,16 @@ impl RecheckRecords {
                                                        AccountId,
                                                        Timestamp,
                                                        u64) {
-        let extra_1: [u8; 64] = RecheckRecords::string_to_hash(extra_1_str);
+        let extra_1: CryptoHash = RecheckRecords::string_to_hex_bytes(extra_1_str);
 
         if self.e1.get(&extra_1).is_none() {
             return RecheckRecords::null_record();
         }
 
-        let record_id: [u8; 64] = self.e1.get(&extra_1)
+        let record_id: CryptoHash = self.e1.get(&extra_1)
             .expect("None existing record");
 
-        let record_id_str: String = RecheckRecords::hash_to_string(record_id);
+        let record_id_str: String = RecheckRecords::hex_bytes_to_string(record_id);
 
         return RecheckRecords::records(self, record_id_str);
     }

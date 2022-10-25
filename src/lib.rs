@@ -325,7 +325,7 @@ mod tests {
         return builder;
     }
 
-    fn create_random_hash() -> String {
+    fn create_random_hash_string() -> String {
         use rand::Rng;
 
         const HEX_CHARSET: &[u8] = b"abcdef0123456789";
@@ -349,11 +349,11 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_trail_str{:?}",random_record_id);
 
         contract.createRecord(random_record_id.clone(),
@@ -384,11 +384,11 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_parent_record_id = create_random_hash();
+        let random_parent_record_id = create_random_hash_string();
         log!("random_parent_record_id{:?}",random_parent_record_id);
-        let random_parent_trail = create_random_hash();
+        let random_parent_trail = create_random_hash_string();
         log!("random_parent_trail{:?}",random_parent_trail);
-        let random_parent_trail_signature = create_random_hash();
+        let random_parent_trail_signature = create_random_hash_string();
         log!("random_parent_trail_signature{:?}",random_parent_record_id);
 
         contract.createRecord(random_parent_record_id.clone(),
@@ -396,11 +396,11 @@ mod tests {
                               random_parent_trail_signature.clone());
 
 
-        let random_sub_record_id = create_random_hash();
+        let random_sub_record_id = create_random_hash_string();
         log!("random_sub_record_id{:?}",random_sub_record_id);
-        let random_sub_trail = create_random_hash();
+        let random_sub_trail = create_random_hash_string();
         log!("random_sub_trail{:?}",random_sub_trail);
-        let random_sub_trail_signature = create_random_hash();
+        let random_sub_trail_signature = create_random_hash_string();
         log!("random_trail_str{:?}",random_parent_record_id);
 
         contract.createSubRecord(random_sub_record_id.clone(),
@@ -432,15 +432,15 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_parent_trail_signature{:?}",random_trail_signature);
-        let random_extra_0 = create_random_hash();
+        let random_extra_0 = create_random_hash_string();
         log!("random_extra_0{:?}",random_extra_0);
-        let random_extra_1 = create_random_hash();
+        let random_extra_1 = create_random_hash_string();
         log!("random_extra_1{:?}",random_extra_1);
 
         contract.createSubRecordWithExtras2(random_record_id.clone(),
@@ -474,11 +474,11 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_trail_str{:?}",random_record_id);
 
         contract.createRecord(random_record_id.clone(),
@@ -509,15 +509,15 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_parent_trail_signature{:?}",random_trail_signature);
-        let random_extra_0 = create_random_hash();
+        let random_extra_0 = create_random_hash_string();
         log!("random_extra_0{:?}",random_extra_0);
-        let random_extra_1 = create_random_hash();
+        let random_extra_1 = create_random_hash_string();
         log!("random_extra_1{:?}",random_extra_1);
 
         contract.createSubRecordWithExtras2(random_record_id.clone(),
@@ -551,15 +551,15 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_parent_trail_signature{:?}",random_trail_signature);
-        let random_extra_0 = create_random_hash();
+        let random_extra_0 = create_random_hash_string();
         log!("random_extra_0{:?}",random_extra_0);
-        let random_extra_1 = create_random_hash();
+        let random_extra_1 = create_random_hash_string();
         log!("random_extra_1{:?}",random_extra_1);
 
         contract.createSubRecordWithExtras2(random_record_id.clone(),
@@ -594,20 +594,20 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_trail_str{:?}",random_record_id);
 
         contract.createRecord(random_record_id.clone(),
                               random_trail.clone(),
                               random_trail_signature.clone());
 
-        let random_trail_2 = create_random_hash();
+        let random_trail_2 = create_random_hash_string();
         log!("random_trail_2{:?}",random_trail_2);
-        let random_trail_signature_2 = create_random_hash();
+        let random_trail_signature_2 = create_random_hash_string();
         log!("random_trail_signature_2{:?}",random_trail_signature_2);
 
         contract.createRecord(random_record_id.clone(),
@@ -622,7 +622,7 @@ mod tests {
         let contract = RecheckRecords::default();
         testing_env!(context.is_view(true).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
 
         let result = contract.records(random_record_id);
@@ -640,11 +640,11 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_trail_str{:?}",random_record_id);
 
         contract.createRecord(random_record_id.clone(),
@@ -667,15 +667,15 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_parent_trail_signature{:?}",random_trail_signature);
-        let random_extra_0 = create_random_hash();
+        let random_extra_0 = create_random_hash_string();
         log!("random_extra_0{:?}",random_extra_0);
-        let random_extra_1 = create_random_hash();
+        let random_extra_1 = create_random_hash_string();
         log!("random_extra_1{:?}",random_extra_1);
 
         contract.createSubRecordWithExtras2(random_record_id.clone(),
@@ -701,15 +701,15 @@ mod tests {
         let mut contract = RecheckRecords::default();
         testing_env!(context.is_view(false).build());
 
-        let random_record_id = create_random_hash();
+        let random_record_id = create_random_hash_string();
         log!("random_record_id{:?}",random_record_id);
-        let random_trail = create_random_hash();
+        let random_trail = create_random_hash_string();
         log!("random_trail{:?}",random_trail);
-        let random_trail_signature = create_random_hash();
+        let random_trail_signature = create_random_hash_string();
         log!("random_parent_trail_signature{:?}",random_trail_signature);
-        let random_extra_0 = create_random_hash();
+        let random_extra_0 = create_random_hash_string();
         log!("random_extra_0{:?}",random_extra_0);
-        let random_extra_1 = create_random_hash();
+        let random_extra_1 = create_random_hash_string();
         log!("random_extra_1{:?}",random_extra_1);
 
         contract.createSubRecordWithExtras2(random_record_id.clone(),

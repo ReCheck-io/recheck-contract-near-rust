@@ -72,7 +72,8 @@ impl RecheckRecords {
     }
 
     fn hex_bytes_to_string(hex_bytes: CryptoHash) -> String {
-        return encode(hex_bytes);
+        let string: String = encode(hex_bytes);
+        return string;
     }
 
     fn null_record() -> (String,
@@ -724,5 +725,25 @@ mod tests {
         let expected = RecheckRecords::null_record();
 
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn check_string_to_hex_to_string_conversion() {
+        let hex_string_input: String = "a0ac5893c435ce0506ba227018f5d0b61e371bdffdb91030b8b502db632ee020".to_string();
+
+        let result_hex_bytes: CryptoHash = RecheckRecords::string_to_hex_bytes(hex_string_input.clone());
+
+        log!("result bytes{:?}",result_hex_bytes);
+
+        let expected_hex_bytes: CryptoHash = [160, 172, 88, 147, 196, 53, 206, 5, 6, 186, 34, 112, 24, 245, 208, 182, 30, 55, 27, 223, 253, 185, 16, 48, 184, 181, 2, 219, 99, 46, 224, 32];
+
+        assert_eq!(result_hex_bytes, expected_hex_bytes);
+
+        let hex_string_result: String = RecheckRecords::hex_bytes_to_string(result_hex_bytes.clone
+        ());
+
+        log!("result string{:?}",hex_string_result);
+
+        assert_eq!(hex_string_result, hex_string_input);
     }
 }

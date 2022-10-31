@@ -112,13 +112,13 @@ X yocto / 10^24 = Y NEAR
 Execute change method (*you have to be logged in with the **same** NEAR wallet used for deployment*)
 
 ```bash
-near call --accountId YOUR-WALLET-ID.TESTNET DEV-ACCOUNT-USED-FOR-DEPLOYMENT createSubRecordWithExtras2 '{"recordIdStr":"SET_HASH_VALUE","parentRecordIdStr":"SET_HASH_VALUE","trailStr":"SET_HASH_VALUE","trailSignatureStr":"SET_HASH_VALUE","extra0Str":"SET_HASH_VALUE","extra1Str":"SET_HASH_VALUE"}'
+near call --accountId YOUR-WALLET-ID.TESTNET ACCOUNT-USED-FOR-DEPLOYMENT createSubRecordWithExtras2 '{"recordIdStr":"SET_HASH_VALUE","parentRecordIdStr":"SET_HASH_VALUE","trailStr":"SET_HASH_VALUE","trailSignatureStr":"SET_HASH_VALUE","extra0Str":"SET_HASH_VALUE","extra1Str":"SET_HASH_VALUE"}'
 ```
 
 Execute view method (*with **any** logged in wallet*)
 
 ```bash
-near call --accountId ANY-WALLET-ID.TESTNET ANY-ACCOUNT records '{"record_id_str":"SET_HASH_VALUE"}'
+near view --accountId ANY-WALLET-ID.TESTNET ACCOUNT-USED-FOR-DEPLOYMENT records '{"record_id_str":"SET_HASH_VALUE"}'
 ```
 
 ---

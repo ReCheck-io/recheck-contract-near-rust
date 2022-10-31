@@ -100,6 +100,7 @@ impl RecheckRecords {
 #[near_bindgen]
 #[allow(non_snake_case)]
 impl RecheckRecords {
+    #[allow(non_snake_case)]
     pub fn createSubRecordWithExtras2(&mut self,
                                       record_id_str: String,
                                       parent_record_id_str: String,
@@ -146,6 +147,7 @@ impl RecheckRecords {
         self.e1.insert(&extra_1, &record_id);
     }
 
+    #[allow(non_snake_case)]
     pub fn createSubRecord(&mut self,
                            record_id_str: String,
                            parent_record_id_str: String,
@@ -165,6 +167,7 @@ impl RecheckRecords {
                                                           extra_1_str);
     }
 
+    #[allow(non_snake_case)]
     pub fn createRecord(&mut self,
                         record_id_str: String,
                         trail_str: String,
@@ -184,6 +187,7 @@ impl RecheckRecords {
                                                           extra_1_str);
     }
 
+    #[allow(non_snake_case)]
     pub fn records(self, record_id_str: String) -> (String,
                                                     String,
                                                     String,
@@ -216,6 +220,7 @@ impl RecheckRecords {
         return (record_id, parent_record_id, trail, trail_signature, creator, timestamp, sub_records_length);
     }
 
+    #[allow(non_snake_case)]
     pub fn subRecord(self, sub_record_id_str: String, index: u64) -> (String,
                                                                       String,
                                                                       String,
@@ -242,6 +247,7 @@ impl RecheckRecords {
         return RecheckRecords::records(self, sub_record_id_str);
     }
 
+    #[allow(non_snake_case)]
     pub fn verifyTrail(self, trail_str: String) -> (String,
                                                     String,
                                                     String,
@@ -264,6 +270,7 @@ impl RecheckRecords {
         return RecheckRecords::records(self, record_id_str);
     }
 
+    #[allow(non_snake_case)]
     pub fn verifyExtra0(self, extra_0_str: String) -> (String,
                                                        String,
                                                        String,
@@ -286,6 +293,7 @@ impl RecheckRecords {
         return RecheckRecords::records(self, record_id_str);
     }
 
+    #[allow(non_snake_case)]
     pub fn verifyExtra1(self, extra_1_str: String) -> (String,
                                                        String,
                                                        String,

@@ -112,13 +112,29 @@ X yocto / 10^24 = Y NEAR
 Execute change method (*you have to be logged in with the **same** NEAR wallet used for deployment*)
 
 ```bash
-near call --accountId YOUR-WALLET-ID.TESTNET ACCOUNT-USED-FOR-DEPLOYMENT createSubRecordWithExtras2 '{"recordIdStr":"SET_HASH_VALUE","parentRecordIdStr":"SET_HASH_VALUE","trailStr":"SET_HASH_VALUE","trailSignatureStr":"SET_HASH_VALUE","extra0Str":"SET_HASH_VALUE","extra1Str":"SET_HASH_VALUE"}'
+near call --accountId YOUR-WALLET-ID.TESTNET ACCOUNT-USED-FOR-DEPLOYMENT createSubRecordWithExtras2 '{"record_id_str":"SET_HASH_VALUE","parent_record_id_str":"SET_HASH_VALUE","trail_str":"SET_HASH_VALUE","trail_signature_str":"SET_HASH_VALUE","extra_0_str":"SET_HASH_VALUE","extra_1_str":"SET_HASH_VALUE"}'
 ```
 
 Execute view method (*with **any** logged in wallet*)
 
 ```bash
 near view --accountId ANY-WALLET-ID.TESTNET ACCOUNT-USED-FOR-DEPLOYMENT records '{"record_id_str":"SET_HASH_VALUE"}'
+```
+
+### 5. Function Call Keys
+
+If you don't want to use the Full Access Keys you can create Function Call Keys for the smart contract account.
+
+First generate the new key.
+
+```bash
+near generate-key
+```
+
+Then add the newly created key to the smart contract account.
+
+```bash
+near add-key ACCOUNT-USED-FOR-DEPLOYMENT NEWLY_CREATED_PUB_KEY --contract-id ACCOUNT-USED-FOR-DEPLOYMENT
 ```
 
 ---

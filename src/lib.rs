@@ -97,9 +97,11 @@ impl RecheckRecords {
     }
 }
 
+//Write functions
 #[near_bindgen]
 #[allow(non_snake_case)]
 impl RecheckRecords {
+    #[private]
     #[allow(non_snake_case)]
     pub fn createSubRecordWithExtras2(&mut self,
                                       record_id_str: String,
@@ -147,6 +149,7 @@ impl RecheckRecords {
         self.e1.insert(&extra_1, &record_id);
     }
 
+    #[private]
     #[allow(non_snake_case)]
     pub fn createSubRecord(&mut self,
                            record_id_str: String,
@@ -167,6 +170,7 @@ impl RecheckRecords {
                                                           extra_1_str);
     }
 
+    #[private]
     #[allow(non_snake_case)]
     pub fn createRecord(&mut self,
                         record_id_str: String,
@@ -186,7 +190,12 @@ impl RecheckRecords {
                                                           extra_0_str,
                                                           extra_1_str);
     }
+}
 
+//Read-only functions
+#[near_bindgen]
+#[allow(non_snake_case)]
+impl RecheckRecords {
     #[allow(non_snake_case)]
     pub fn records(self, record_id_str: String) -> (String,
                                                     String,
@@ -325,7 +334,7 @@ mod tests {
 
     fn get_context(predecessor_account_id: AccountId) -> VMContextBuilder {
         let mut builder = VMContextBuilder::new();
-        builder.current_account_id(accounts(0))
+        builder.current_account_id(predecessor_account_id.clone())
             .signer_account_id(predecessor_account_id.clone())
             .predecessor_account_id(predecessor_account_id);
 
